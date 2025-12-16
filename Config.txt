@@ -79,3 +79,13 @@ grub-mkrescue -o kernel.iso isodir
 
 # 3.3. Executa a imagem no QEMU
 qemu-system-i386 -cdrom kernel.iso -boot d -serial stdio
+
+
+
+
+# IMPORTANTE !!!!!
+# não esqueça  de dar permições :
+chmod +x config.sh
+
+# para executar:
+./config.sh
