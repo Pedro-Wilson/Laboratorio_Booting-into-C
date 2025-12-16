@@ -1,0 +1,81 @@
+# ====================================================================
+# PASSO 1: INSTALAÇÃO DE DEPENDÊNCIAS DO SISTEMA E EMULADORES
+# ====================================================================
+
+# 1. Instalação das bibliotecas necessárias para construir o GCC e o Binutils
+sudo apt update
+sudo apt install build-essential git curl texinfo bison flex libgmp3-dev libmpc-dev libmpfr-dev
+
+# 2. Instalação das ferramentas de emulação (QEMU) e de boot (GRUB/xorriso)
+sudo apt install qemu-system-i386 xorriso grub-pc-bin
+
+# ====================================================================
+# PASSO 2: CONSTRUÇÃO E INSTALAÇÃO DA TOOLCHAIN CRUZADA (i386-elf)
+# ====================================================================
+
+# 2.1. Configuração do Ambiente
+export TARGET=i386-elf
+export PREFIX="/usr/local/i386elfgcc" # Local onde a toolchain será instalada
+
+# Adiciona o diretório da toolchain ao PATH (CRÍTICO para que o make encontre i386-elf-as)
+export PATH="$PREFIX/bin:$PATH"
+
+# Cria o diretório de instalação com permissões de root
+sudo mkdir -p $PREFIX
+
+# Cria o diretório de fontes, navega até ele e baixa os tarballs
+mkdir -p $HOME/src_osdev
+cd $HOME/src_osdev
+
+curl -L 'https://ftpmirror.gnu.org/binutils/binutils-2.42.tar.xz' -o binutils.tar.xz
+curl -L 'https://ftpmirror.gnu.org/gcc/gcc-14.1.0/gcc-14.1.0.tar.xz' -o gcc.tar.xz
+
+tar -xf binutils.tar.xz
+tar -xf gcc.tar.xz
+mv binutils-2.42 binutils-src
+mv gcc-14.1.0 gcc-src
+
+
+# 2.2. Compilação do Binutils (Assembler e Linker)
+mkdir build-binutils
+cd build-binutils
+../binutils-src/configure --target=$TARGET --prefix="$PREFIX" \
+    --with-sysroot --disable-nls --disable-werror
+make
+sudo make install
+cd..
+
+
+# 2.3. Compilação e Instalação do GCC (Compilador C)
+# A flag --without-headers garante que o GCC não dependa de headers do sistema host (freestanding). [3]
+mkdir build-gcc
+cd build-gcc
+../gcc-src/configure --target=$TARGET --prefix="$PREFIX" \
+    --enable-languages=c \
+    --without-headers \
+    --disable-nls
+make all-gcc
+sudo make install-gcc
+cd..
+
+# ====================================================================
+# PASSO 3: COMPILAÇÃO E EXECUÇÃO DO PROJETO
+# ====================================================================
+
+# Navega para o diretório raiz do projeto (onde está o Makefile)
+cd /caminho/para/kernel-dev
+
+# 3.1. Executa o build (make deve encontrar a toolchain no PATH)
+make
+
+# 3.2. Sequência de Geração e Execução do ISO
+mkdir -p isodir/boot/grub
+cp kernel.elf isodir/boot/
+echo 'menuentry "--> Meu Kernel: Hello World! :)" {
+    multiboot /boot/kernel.elf
+}' > isodir/boot/grub/grub.cfg
+
+grub-mkrescue -o kernel.iso isodir
+
+# 3.3. Executa a imagem no QEMU
+qemu-system-i386 -cdrom kernel.iso -boot d -serial stdio
