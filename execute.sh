@@ -14,7 +14,7 @@ mkdir -p isodir/boot/grub
 cp kernel.elf isodir/boot/
 
 # Cria o arquivo de configuração do GRUB
-echo 'menuentry "Meu Kernel i386 Multiboot" {
+echo 'menuentry "--> Meu Kernel HelloWorld ! :) " {
     multiboot /boot/kernel.elf
 }' > isodir/boot/grub/grub.cfg
 
