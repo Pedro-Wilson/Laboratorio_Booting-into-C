@@ -4,6 +4,11 @@ Um laboratório prático para aprender e desenvolver o processo de **inicializa�
 
 Este projeto é um mergulho na programação de **baixo nível**, abordando a arquitetura de computadores e os fundamentos dos sistemas operacionais.
 
+
+<img width="721" height="449" alt="Screenshot_20251216_115254-6" src="https://github.com/user-attachments/assets/209de444-f9c7-45ab-a6fc-bee640e61fa1" />
+
+
+
 ---
 
 ### 🌟 Visão Geral
@@ -52,3 +57,6 @@ Após a compilação bem-sucedida, você pode testar a imagem bootável gerada u
 make run
 ```
 O QEMU irá carregar a imagem, e o bootloader deverá ser executado, carregando e transferindo o controle para o seu código 
+<br></br>
+<img width="717" height="450" alt="xxxxxx" src="https://github.com/user-attachments/assets/1be46aff-d2af-4092-afdc-bce0149b2757" />
+
